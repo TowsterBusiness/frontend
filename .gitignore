@@ -1,0 +1,27 @@
+# Xcode
+build/
+DerivedData/
+
+# User-specific Xcode settings
+*.xcuserdatad
+xcuserdata/
+
+# Sensitive data
+secret-config.plist
+
+# Xcode project file
+Save Your Fridge.xcodeproj/
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Xcode
+.DS_Store
+*.swp
+xcuserdata/
+DerivedData/
+
+# Build artifacts
+/build/
+*.xcodeproj/xcuserdata/

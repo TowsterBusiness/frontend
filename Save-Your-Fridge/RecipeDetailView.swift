@@ -1,3 +1,11 @@
+//
+//  RecipeDetailView.swift
+//  Save-Your-Fridge
+//
+//  Created by Towster on 10/1/25.
+//
+
+
 import SwiftUI
 
 struct RecipeDetailView: View {

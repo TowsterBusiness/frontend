@@ -1,3 +1,11 @@
+//
+//  ImageUploader.swift
+//  Save-Your-Fridge
+//
+//  Created by Towster on 10/1/25.
+//
+
+
 import UIKit
 
 class ImageUploader {

@@ -1,35 +1,36 @@
+//
+//  HomeView.swift
+//  Save-Your-Fridge
+//
+//  Created by Towster on 10/1/25.
+//
+
+
 import SwiftUI
 
-struct HomeView: View {
+import SwiftUI
+
+struct HomeTabsView: View {
     @StateObject var viewModel = RecipeViewModel()
     
     var body: some View {
-        NavigationView {
-            List(viewModel.recipes, id: \.GeneralInfo.id) { recipe in
-                NavigationLink(destination: RecipeDetailView(recipe: recipe, viewModel: viewModel)) {
-                    HStack {
-                        AsyncImage(url: URL(string: recipe.GeneralInfo.image)) { image in
-                            image.resizable()
-                        } placeholder: {
-                            Color.gray
-                        }
-                        .frame(width: 80, height: 80)
-                        .cornerRadius(8)
-                        
-                        VStack(alignment: .leading) {
-                            Text(recipe.GeneralInfo.title)
-                                .font(.headline)
-                            Text("\(recipe.GeneralInfo.usedIngredients.count) ingredients")
-                                .font(.subheadline)
-                                .foregroundColor(.gray)
-                        }
-                    }
+        TabView {
+            RecipesListView(viewModel: viewModel)
+                .tabItem {
+                    Label("Recipes", systemImage: "list.bullet")
                 }
-            }
-            .navigationTitle("Recipes")
-            .onAppear {
-                viewModel.fetchRecipes()
-            }
+            
+            HistoryView(viewModel: viewModel)
+                .tabItem {
+                    Label("Saved", systemImage: "bookmark.fill")
+                }
+        }
+        .onAppear {
+            viewModel.fetchRecipes()
         }
     }
+}
+
+#Preview {
+    return HomeTabsView()
 }

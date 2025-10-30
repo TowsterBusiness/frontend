@@ -1,3 +1,11 @@
+//
+//  RecipeFetcher.swift
+//  Save-Your-Fridge
+//
+//  Created by Towster on 10/21/25.
+//
+
+
 import Foundation
 
 class RecipeFetcher {
@@ -5,7 +13,7 @@ class RecipeFetcher {
     private init() {}
 
     func fetchRecipes(with ingredients: [String], completion: @escaping (Result<[RecipeResponse], Error>) -> Void) {
-        guard let url = URL(string: "https://saveyourfridge-backend.onrender.com/testgetRecipies") else {
+        guard let url = URL(string: "https://saveyourfridge-backend.onrender.com/getRecipies") else {
             completion(.failure(NSError(domain: "Invalid URL", code: 0)))
             return
         }
@@ -15,7 +23,7 @@ class RecipeFetcher {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         // ✅ Backend expects JSON with "Ingredients" key
-        let payload: [String: Any] = ["Ingredients": ingredients]
+        let payload: [String: Any] = ["ingredients": ingredients]
         request.httpBody = try? JSONSerialization.data(withJSONObject: payload, options: [])
 
         URLSession.shared.dataTask(with: request) { data, response, error in

@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 class RecipeViewModel: ObservableObject {
     @Published var recipes: [RecipeResponse] = []
@@ -16,6 +17,7 @@ class RecipeViewModel: ObservableObject {
             saveToUserDefaults()
         }
     }
+    @Published var ingredients: [String] = []
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -23,22 +25,8 @@ class RecipeViewModel: ObservableObject {
         loadFromUserDefaults()
     }
     
-    // MARK: - Fetch Recipes
-    func fetchRecipes() {
-        guard let url = URL(string: "http://localhost:8000/test") else { return }
-        
-        URLSession.shared.dataTaskPublisher(for: url)
-            .map { $0.data }
-            .decode(type: [RecipeResponse].self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                if case let .failure(error) = completion {
-                    print("Error fetching recipes:", error)
-                }
-            }, receiveValue: { [weak self] recipes in
-                self?.recipes = recipes
-            })
-            .store(in: &cancellables)
+    func storeRecipes(recipes: [RecipeResponse]) {
+        self.recipes = recipes
     }
     
     // MARK: - Save Recipe
@@ -46,6 +34,16 @@ class RecipeViewModel: ObservableObject {
         if !savedRecipes.contains(where: { $0.GeneralInfo.id == recipe.GeneralInfo.id }) {
             savedRecipes.append(recipe)
         }
+    }
+    
+    // MARK: - Unsave Recipe
+    func unsaveRecipe(_ recipe: RecipeResponse) {
+        savedRecipes.removeAll { $0.GeneralInfo.id == recipe.GeneralInfo.id }
+    }
+    
+    // MARK: - Check if Recipe Saved
+    func isRecipeSaved(_ recipe: RecipeResponse) -> Bool {
+        return savedRecipes.contains(where: { $0.GeneralInfo.id == recipe.GeneralInfo.id })
     }
     
     // MARK: - UserDefaults
@@ -61,4 +59,44 @@ class RecipeViewModel: ObservableObject {
             savedRecipes = decoded
         }
     }
+    
+    func uploadImageAndFetchIngredients(_ image: UIImage) {
+        ImageUploader.shared.uploadImageForIngredients(image) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let ingredientString):
+                    self?.addIngredients(from: ingredientString)
+                case .failure(let error):
+                    print("❌ Failed to get ingredients:", error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func addIngredient(_ name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !ingredients.contains(trimmed) else { return }
+        ingredients.insert(trimmed, at: 0)
+    }
+
+    func addIngredients(from string: String) {
+        let parsed = string
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        for ingredient in parsed where !ingredients.contains(ingredient) {
+            ingredients.insert(ingredient, at: 0)
+        }
+    }
+
+    func deleteIngredient(offsets: IndexSet) {
+        ingredients.remove(atOffsets: offsets)
+    }
+
+    func clearAllIngredients() {
+        ingredients.removeAll()
+    }
+
+
 }

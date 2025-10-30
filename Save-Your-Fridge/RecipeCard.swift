@@ -1,3 +1,12 @@
+//
+//  RecipeCard.swift
+//  Save-Your-Fridge
+//
+//  Created by Towster on 10/20/25.
+//
+
+import SwiftUI
+
 struct RecipeCard: View {
     let recipe: RecipeResponse
 
